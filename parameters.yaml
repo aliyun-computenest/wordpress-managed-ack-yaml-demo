@@ -5,8 +5,8 @@ Parameters:
     Type: String
     AssociationProperty: ALIYUN::ECS::RegionId
     Label:
-      en: 部署地域
-      zh-cn: region id
+      en: region id
+      zh-cn: 部署地域
   RoleName:
     Type: String
     AssociationProperty: ALIYUN::RAM::Service::Role
@@ -17,9 +17,12 @@ Parameters:
   ClusterId:
     Type: String
     AssociationProperty: ALIYUN::CS::Cluster::ClusterId
+    AssociationPropertyMetadata:
+      RegionId: ${RegionId}
     Label:
-      en: 容器服务集群ID
-      zh-cn: cluster id
+      en: cluster id
+      zh-cn: 容器服务集群ID
+    Default: c35b5122be2cb43338e23589396e2667b
 Metadata:
   ALIYUN::ROS::Interface:
     # 定义资源分组，创建服务实例时，同一分组的参数分布在一起
