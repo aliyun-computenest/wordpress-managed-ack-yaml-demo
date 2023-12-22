@@ -18,21 +18,33 @@ Service:
                 Vcpu: "1"
                 Memory: 1Gi
                 Storage: 20Gi
-              Type: Noraml
+              Type: Normal
+              OrderList:
+                - Vcpu
+                - Memory
+                - Storage
             - Name: 基础版
               Description: 2c2g
               Parameters:
                 Vcpu: "2"
                 Memory: 2Gi
                 Storage: 40Gi
-              Type: Noraml
+              Type: Normal
+              OrderList:
+                - Vcpu
+                - Memory
+                - Storage
             - Name: 高配版
               Description: 2c4g
               Parameters:
                 Vcpu: "2"
                 Memory: 4Gi
                 Storage: 80Gi
-              Type: Noraml
+              Type: Normal
+              OrderList:
+                - Vcpu
+                - Memory
+                - Storage
           HiddenParameterKeys:
             - ClusterId
             - Vcpu
