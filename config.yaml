@@ -47,7 +47,7 @@ Service:
                   Parameters:
                     ClusterId: ${ClusterId}
     TemplateConfigs:
-      - Name: 基础版
+      - Name: wordpress
         AllowedRegions:
           - ${RegionId}
   ServiceType: managed
