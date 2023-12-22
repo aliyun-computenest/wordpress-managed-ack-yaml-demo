@@ -6,7 +6,6 @@ Parameters:
   ClusterId:
     Type: String
     AssociationProperty: ALIYUN::CS::Cluster::ClusterId
-    Default: c35b5122be2cb43338e23589396e2667b
   Memory:
     Type: String
     AllowedValues:

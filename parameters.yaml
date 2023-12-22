@@ -22,7 +22,6 @@ Parameters:
     Label:
       en: cluster id
       zh-cn: 容器服务集群ID
-    Default: c35b5122be2cb43338e23589396e2667b
 Metadata:
   ALIYUN::ROS::Interface:
     # 定义资源分组，创建服务实例时，同一分组的参数分布在一起
