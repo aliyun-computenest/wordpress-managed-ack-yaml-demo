@@ -70,7 +70,7 @@
     ![image.png](deploy_3.png)
 4. 在用户侧进入待部署状态后需要服务商同意用户的部署
     ![image.png](deploy_4.png)
-    [!image.png](deploy_5.png)
+    ![image.png](deploy_5.png)
 5. 等待部署完成后就可以开始使用服务，进入服务实例详情点击Endpoint。
     ![image.png](deploy_6.png)
 6. 部署结果
