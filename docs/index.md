@@ -2,7 +2,7 @@
 
 ## 服务说明
 
-本文介绍容器服务部署wordpress实现托管版多租户的流程，本示例对应的[git地址](https://github.com/aliyun-computenest/wordpress-managed-ack-yaml-demo)
+本文介绍容器服务部署wordpress实现托管版多租户的流程，本示例对应的[git地址](https://github.com/aliyun-computenest/wordpress-managed-ack-demo)
 
 根据该服务模板构建的服务默认包含三种套餐：
 
@@ -319,6 +319,77 @@
       DefaultNamespace:
         Ref: ALIYUN::StackName
 ```
+helm部署wordpress的方式类似，需要用fluxcd yaml的方式间接的来弄,参数template/helm.yaml里的示例
+```yaml
+ClusterApplication:
+    Type: ALIYUN::CS::ClusterApplication
+    Properties:
+      YamlContent:
+        Fn::Sub:
+          - |
+            apiVersion: source.toolkit.fluxcd.io/v1beta2
+            kind: HelmRepository
+            metadata:
+              name: wordpress
+            spec:
+              type: oci
+              interval: 5m0s
+              url: oci://registry-1.docker.io/bitnamicharts
+            ---
+            apiVersion: helm.toolkit.fluxcd.io/v2beta1
+            kind: HelmRelease
+            metadata:
+              name: wordpress
+            spec:
+              interval: 5m
+              chart:
+                spec:
+                  chart: wordpress
+                  version: '15.4.1'
+                  sourceRef:
+                    kind: HelmRepository
+                    name: wordpress
+                  interval: 1m
+              values:
+                mariadb:
+                  primary:
+                    persistence:
+                      enabled: true
+                      storageClass: alicloud-disk-essd
+                      size: 20Gi
+                persistence:
+                  enabled: false
+                replicaCount: 1
+                service:
+                  type: ClusterIP
+                ingress:
+                  enabled: true
+                  hostname: ${Name}.${ClusterId}.${RegionId}.alicontainer.com
+                resources:
+                  limits:
+                    cpu: "${Vcpu}"
+                    memory: "${Memory}"
+                  requests:
+                    cpu: "${Vcpu}"
+                    memory: "${Memory}"
+          - Name:
+              Ref: ALIYUN::StackName
+            RegionId:
+              Ref: ALIYUN::Region
+            ClusterId:
+              Ref: ClusterId
+            Storage:
+              Ref: Storage
+            Memory:
+              Ref: Memory
+            Vcpu:
+              Ref: Vcpu
+      ClusterId:
+        Ref: ClusterId
+      DefaultNamespace:
+        Ref: ALIYUN::StackName
+```
+
 # 更多功能
 
 ## 计量计费
