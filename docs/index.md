@@ -320,6 +320,10 @@
         Ref: ALIYUN::StackName
 ```
 helm部署wordpress的方式类似，需要用fluxcd yaml的方式间接的来弄,参数template/helm.yaml里的示例
+helm部署的前提需要安装fluxcd系统
+```shell
+helm install fluxcd oci://registry-1.docker.io/bitnamicharts/flux
+```
 ```yaml
 ClusterApplication:
     Type: ALIYUN::CS::ClusterApplication
