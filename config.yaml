@@ -17,39 +17,32 @@ Service:
               Parameters:
                 Vcpu: "1"
                 Memory: 1Gi
-                Storage: 20Gi
               Type: Normal
               OrderList:
                 - Vcpu
                 - Memory
-                - Storage
             - Name: 基础版
               Description: 2c2g
               Parameters:
                 Vcpu: "2"
                 Memory: 2Gi
-                Storage: 40Gi
               Type: Normal
               OrderList:
                 - Vcpu
                 - Memory
-                - Storage
             - Name: 高配版
               Description: 2c4g
               Parameters:
                 Vcpu: "2"
                 Memory: 4Gi
-                Storage: 80Gi
               Type: Normal
               OrderList:
                 - Vcpu
                 - Memory
-                - Storage
           HiddenParameterKeys:
             - ClusterId
             - Vcpu
             - Memory
-            - Storage
           ParameterMappings:
             - ParameterKey: RegionId
               ParameterMappingKeys:
@@ -62,6 +55,33 @@ Service:
       - Name: wordpress
         AllowedRegions:
           - ${RegionId}
+        UpdateInfo:
+          ParametersAllowedToBeModified:
+            - ReplicaCount
+            - Storage
+  OperationMetadata:
+    ModifyParametersConfig:
+      - TemplateName: wordpress
+        Operation:
+          - Name: 更改套餐
+            Description: 更改套餐规格
+            Type: Custom
+            SupportPredefinedParameters: true
+            EnableLogging: false
+          - Name: 扩容磁盘
+            Description: mysql磁盘扩容
+            Type: Upgrade
+            SupportPredefinedParameters: false
+            EnableLogging: false
+            Parameters:
+              - Storage
+          - Name: 更改副本数
+            Description: 更改wordpress副本数
+            Type: Custom
+            SupportPredefinedParameters: false
+            EnableLogging: false
+            Parameters:
+              - ReplicaCount
   ServiceType: managed
   ServiceInfo:
     Locale: zh-CN

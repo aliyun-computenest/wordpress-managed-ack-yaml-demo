@@ -6,11 +6,11 @@
 
 根据该服务模板构建的服务默认包含三种套餐：
 
-| 套餐名  | vCPU与内存      | 系统盘            |  
-|--------|----------------|------------------|
-| 低配版 | 1vCPU 1GiB | ESSD云盘 20GiB PL0 | 
-| 基础版 | 2vCPU 2GiB  | ESSD云盘 40GiB PL0 | 
-| 高配版 | 2vCPU 4GiB | ESSD云盘 80GiB PL0 |
+| 套餐名  | vCPU与内存      | 
+|--------|----------------|
+| 低配版 | 1vCPU 1GiB |
+| 基础版 | 2vCPU 2GiB  |
+| 高配版 | 2vCPU 4GiB |
 
 本示例需要提前准备ack集群，需要到[容器服务控制台](https://cs.console.aliyun.com/) 提前创建
 本示例创建过程大约持续1分钟，当服务变成待提交后构建成功
@@ -115,6 +115,24 @@
   ClusterApplication:
     Type: ALIYUN::CS::ClusterApplication
     Properties:
+      WaitUntil:
+        - Kind: Deployment
+          Name: wordpress
+          JsonPath: $.status.readyReplicas
+          Operator: Equals
+          Value:
+            Ref: ReplicaCount
+          Timeout: 300
+          ValueType: Json
+          FirstMatch: true
+        - Kind: Deployment
+          Name: wordpress-mysql
+          JsonPath: $.status.readyReplicas
+          Operator: Equals
+          Value: '1'
+          Timeout: 300
+          ValueType: Json
+          FirstMatch: true
       YamlContent:
         Fn::Sub:
           - |
@@ -222,20 +240,6 @@
                 tier: frontend
               type: ClusterIP
             ---
-            apiVersion: v1
-            kind: PersistentVolumeClaim
-            metadata:
-              name: wp-pv-claim
-              labels:
-                app: wordpress
-            spec:
-              accessModes:
-                - ReadWriteOnce
-              storageClassName: alicloud-disk-essd
-              resources:
-                requests:
-                  storage: ${Storage}
-            ---
             apiVersion: apps/v1
             kind: Deployment
             metadata:
@@ -243,6 +247,7 @@
               labels:
                 app: wordpress
             spec:
+              replicas: ${ReplicaCount}
               selector:
                 matchLabels:
                   app: wordpress
@@ -278,13 +283,6 @@
                     ports:
                     - containerPort: 80
                       name: wordpress
-                    volumeMounts:
-                    - name: wordpress-persistent-storage
-                      mountPath: /var/www/html
-                  volumes:
-                  - name: wordpress-persistent-storage
-                    persistentVolumeClaim:
-                      claimName: wp-pv-claim
             ---
             apiVersion: networking.k8s.io/v1
             kind: Ingress
@@ -308,12 +306,6 @@
               Ref: ALIYUN::Region
             ClusterId:
               Ref: ClusterId
-            Storage:
-              Ref: Storage
-            Memory:
-              Ref: Memory
-            Vcpu:
-              Ref: Vcpu
       ClusterId:
         Ref: ClusterId
       DefaultNamespace:

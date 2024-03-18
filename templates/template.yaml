@@ -23,10 +23,31 @@ Parameters:
       - 20Gi
       - 40Gi
       - 80Gi
+  ReplicaCount:
+    Type: Number
+    Default: 1
 Resources:
   ClusterApplication:
     Type: ALIYUN::CS::ClusterApplication
     Properties:
+      WaitUntil:
+        - Kind: Deployment
+          Name: wordpress
+          JsonPath: $.status.readyReplicas
+          Operator: Equals
+          Value:
+            Ref: ReplicaCount
+          Timeout: 300
+          ValueType: Json
+          FirstMatch: true
+        - Kind: Deployment
+          Name: wordpress-mysql
+          JsonPath: $.status.readyReplicas
+          Operator: Equals
+          Value: '1'
+          Timeout: 300
+          ValueType: Json
+          FirstMatch: true
       YamlContent:
         Fn::Sub:
           - |
@@ -134,20 +155,6 @@ Resources:
                 tier: frontend
               type: ClusterIP
             ---
-            apiVersion: v1
-            kind: PersistentVolumeClaim
-            metadata:
-              name: wp-pv-claim
-              labels:
-                app: wordpress
-            spec:
-              accessModes:
-                - ReadWriteOnce
-              storageClassName: alicloud-disk-essd
-              resources:
-                requests:
-                  storage: ${Storage}
-            ---
             apiVersion: apps/v1
             kind: Deployment
             metadata:
@@ -155,6 +162,7 @@ Resources:
               labels:
                 app: wordpress
             spec:
+              replicas: ${ReplicaCount}
               selector:
                 matchLabels:
                   app: wordpress
@@ -190,13 +198,6 @@ Resources:
                     ports:
                     - containerPort: 80
                       name: wordpress
-                    volumeMounts:
-                    - name: wordpress-persistent-storage
-                      mountPath: /var/www/html
-                  volumes:
-                  - name: wordpress-persistent-storage
-                    persistentVolumeClaim:
-                      claimName: wp-pv-claim
             ---
             apiVersion: networking.k8s.io/v1
             kind: Ingress
@@ -220,12 +221,6 @@ Resources:
               Ref: ALIYUN::Region
             ClusterId:
               Ref: ClusterId
-            Storage:
-              Ref: Storage
-            Memory:
-              Ref: Memory
-            Vcpu:
-              Ref: Vcpu
       ClusterId:
         Ref: ClusterId
       DefaultNamespace:
@@ -252,6 +247,7 @@ Metadata:
           - Memory
           - Vcpu
           - Storage
+          - ReplicaCount
         Label:
           en: 资源信息
       - Parameters:
