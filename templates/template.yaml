@@ -30,24 +30,6 @@ Resources:
   ClusterApplication:
     Type: ALIYUN::CS::ClusterApplication
     Properties:
-      WaitUntil:
-        - Kind: Deployment
-          Name: wordpress
-          JsonPath: $.status.readyReplicas
-          Operator: Equals
-          Value:
-            Ref: ReplicaCount
-          Timeout: 300
-          ValueType: Json
-          FirstMatch: true
-        - Kind: Deployment
-          Name: wordpress-mysql
-          JsonPath: $.status.readyReplicas
-          Operator: Equals
-          Value: '1'
-          Timeout: 300
-          ValueType: Json
-          FirstMatch: true
       YamlContent:
         Fn::Sub:
           - |
