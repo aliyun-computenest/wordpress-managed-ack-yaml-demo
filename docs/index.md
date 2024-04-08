@@ -76,6 +76,23 @@
 6. 部署结果
     ![image.png](deploy_7.png)
 
+
+## 服务实例变配流程
+   ![img_2.png](modify_1.png)
+   ![img.png](modify_2.png)
+
+服务实例创建完成后，用户侧有配置修改的需求，可以点击右上角的修改配置进行变配操作，本服务支持的变配操作有以下三种：
+1. 扩容磁盘，对wordpress中关联的mysql磁盘进行扩容,磁盘只能进行扩容操作，这里从20Gi扩容到40Gi
+    ![img.png](modify_3.png)
+    ![img_2.png](modify_4.png)
+2. 更改套餐，这个可以对套餐规格进行变更，不同的套餐Pod可用的CPU和内存数量不同。
+    ![img_3.png](modify_5.png)
+    ![img_4.png](modify_6.png)
+3. 更改副本数，这个可以对wordpress副本数进行扩缩容操作。
+    ![img_5.png](modify_7.png)
+    ![img_6.png](modify_8.png)
+
+
 ## 售卖配置
 当前服务因为没有配置售卖链路，所以用户侧部署时候需要服务商的二次确认，当服务上架到阿里云云市场后，就可以不经过服务商的二次确认就可以完成部署
 
@@ -385,6 +402,7 @@ ClusterApplication:
       DefaultNamespace:
         Ref: ALIYUN::StackName
 ```
+
 
 # 更多功能
 

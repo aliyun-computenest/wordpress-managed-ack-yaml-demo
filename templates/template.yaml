@@ -36,7 +36,10 @@ Resources:
           JsonPath: $.status.readyReplicas
           Operator: Equals
           Value:
-            Ref: ReplicaCount
+            'Fn::Jq':
+              - First
+              - if . == 0 then "null" else . end
+              - Ref: ReplicaCount
           Timeout: 300
           ValueType: Json
           FirstMatch: true

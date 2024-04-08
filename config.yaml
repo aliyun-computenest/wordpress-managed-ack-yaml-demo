@@ -82,6 +82,15 @@ Service:
             EnableLogging: false
             Parameters:
               - ReplicaCount
+    StatusOperationConfigs:
+      - TemplateName: wordpress
+        DeployScene: ACK
+        Parameters:
+          - ReplicaCount
+        SupportOperations:
+          - Start
+          - Stop
+          - Restart
   ServiceType: managed
   ServiceInfo:
     Locale: zh-CN
