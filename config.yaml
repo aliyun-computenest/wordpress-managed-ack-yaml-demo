@@ -10,7 +10,7 @@ Service:
       UserType: Aliyun
       SupplierTemplateConfigs:
         - Name: wordpress
-          Url: 'templates/template.yaml'
+          Url: 'ros_templates/template.yaml'
           PredefinedParameters:
             - Name: 低配版
               Description: 1c1g
@@ -95,7 +95,7 @@ Service:
   ServiceInfo:
     Locale: zh-CN
     ShortDescription: WordPress ACK容器多租户yaml部署
-    Image: 'icons/service_logo.png'
+    Image: 'resources/icons/service_logo.png'
     Name: Wordpress ACK容器yaml部署
   ShareType: Public
   ApprovalType: Manual

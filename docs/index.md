@@ -123,10 +123,10 @@
 通过ALIYUN::CS::ClusterApplication部署yaml到k8s，并给每个租户的对应到不同namespace上。
 
 详细对应到template.yaml的代码片段如下所示：
-1. 部署 wordpress + mysql。
+1. 部署wordpress + mysql。
 2. 部署ingress根据域名将endpoint对应到新创建的wordpress的service上。
 
-通过配置我们完成了基于ack的托管版部署，部署中公用ack的节点池资源。
+通过配置我们完成了基于ack的托管版部署，部署采用公用ack的节点池资源。
 
 ```yaml
   ClusterApplication:
