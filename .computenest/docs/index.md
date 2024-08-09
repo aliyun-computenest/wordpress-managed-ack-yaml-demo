@@ -12,12 +12,12 @@
 | 基础版 | 2vCPU 2GiB  |
 | 高配版 | 2vCPU 4GiB |
 
-本示例需要提前准备ack集群，需要到[容器服务控制台](https://cs.console.aliyun.com/) 提前创建。
+本示例需要提前准备容器集群，需要到[容器服务控制台](https://cs.console.aliyun.com/) 提前创建。
 本示例创建过程大约持续1分钟，当服务变成待提交后构建成功。
 
 ## 服务架构
 
-本部署架构为ACK多租户部署，架构如下图所示：
+本部署架构为容器多租户部署，架构如下图所示：
 1. 使用ingress根据域名路由到各个租户的wordpress
 2. 每个租户一个k8s namespace，用namespace隔离
 3. wordpress和mysql使用yaml部署
@@ -44,8 +44,8 @@
 
 测试本服务在计算巢上的费用主要涉及：
 
-- 导入的ACK集群的费用
-- 在ACK集群新建的磁盘、网络等费用
+- 导入的容器集群的费用
+- 在容器集群新建的磁盘、网络等费用
 
 
 ## 服务实例部署流程
@@ -126,7 +126,7 @@
 1. 部署wordpress + mysql。
 2. 部署ingress根据域名将endpoint对应到新创建的wordpress的service上。
 
-通过配置我们完成了基于ack的托管版部署，部署采用公用ack的节点池资源。
+通过配置我们完成了基于容器集群的托管版部署。
 
 ```yaml
   ClusterApplication:
@@ -323,80 +323,6 @@
               Ref: ALIYUN::Region
             ClusterId:
               Ref: ClusterId
-      ClusterId:
-        Ref: ClusterId
-      DefaultNamespace:
-        Ref: ALIYUN::StackName
-```
-helm部署wordpress的方式类似，需要用fluxcd的方式间接的实现，参考template/helm.yaml里的示例。
-helm部署的前提是需要安装fluxcd系统。
-```shell
-helm install fluxcd oci://registry-1.docker.io/bitnamicharts/flux
-```
-```yaml
-ClusterApplication:
-    Type: ALIYUN::CS::ClusterApplication
-    Properties:
-      YamlContent:
-        Fn::Sub:
-          - |
-            apiVersion: source.toolkit.fluxcd.io/v1beta2
-            kind: HelmRepository
-            metadata:
-              name: wordpress
-            spec:
-              type: oci
-              interval: 5m0s
-              url: oci://registry-1.docker.io/bitnamicharts
-            ---
-            apiVersion: helm.toolkit.fluxcd.io/v2beta1
-            kind: HelmRelease
-            metadata:
-              name: wordpress
-            spec:
-              interval: 5m
-              chart:
-                spec:
-                  chart: wordpress
-                  version: '15.4.1'
-                  sourceRef:
-                    kind: HelmRepository
-                    name: wordpress
-                  interval: 1m
-              values:
-                mariadb:
-                  primary:
-                    persistence:
-                      enabled: true
-                      storageClass: alicloud-disk-essd
-                      size: 20Gi
-                persistence:
-                  enabled: false
-                replicaCount: 1
-                service:
-                  type: ClusterIP
-                ingress:
-                  enabled: true
-                  hostname: ${Name}.${ClusterId}.${RegionId}.alicontainer.com
-                resources:
-                  limits:
-                    cpu: "${Vcpu}"
-                    memory: "${Memory}"
-                  requests:
-                    cpu: "${Vcpu}"
-                    memory: "${Memory}"
-          - Name:
-              Ref: ALIYUN::StackName
-            RegionId:
-              Ref: ALIYUN::Region
-            ClusterId:
-              Ref: ClusterId
-            Storage:
-              Ref: Storage
-            Memory:
-              Ref: Memory
-            Vcpu:
-              Ref: Vcpu
       ClusterId:
         Ref: ClusterId
       DefaultNamespace:

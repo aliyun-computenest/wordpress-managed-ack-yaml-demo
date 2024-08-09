@@ -84,7 +84,7 @@ Resources:
             spec:
               accessModes:
                 - ReadWriteOnce
-              storageClassName: alicloud-disk-essd
+              storageClassName: alicloud-disk-topology-alltype
               resources:
                 requests:
                   storage: ${Storage}
@@ -109,7 +109,7 @@ Resources:
                     tier: mysql
                 spec:
                   containers:
-                  - image: mysql:8.0
+                  - image: compute-nest-registry.cn-hangzhou.cr.aliyuncs.com/bestpractice/mysql:1.0
                     name: mysql
                     resources:
                       limits:
@@ -179,7 +179,7 @@ Resources:
                     tier: frontend
                 spec:
                   containers:
-                  - image: wordpress:6.2.1-apache
+                  - image: compute-nest-registry.cn-hangzhou.cr.aliyuncs.com/bestpractice/wordpress:6.2.1-apache
                     name: wordpress
                     resources:
                       limits:

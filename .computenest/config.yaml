@@ -92,10 +92,12 @@ Service:
           - Stop
           - Restart
   ServiceType: managed
+  IsSupportOperated: true
+  PolicyNames: AliyunComputeNestPolicyForOperation
   ServiceInfo:
     Locale: zh-CN
-    ShortDescription: WordPress ACK容器多租户yaml部署
+    ShortDescription: WordPress 容器多租户yaml部署
     Image: 'resources/icons/service_logo.png'
-    Name: Wordpress ACK容器yaml部署
+    Name: Wordpress 容器yaml部署
   ShareType: Public
   ApprovalType: Manual
