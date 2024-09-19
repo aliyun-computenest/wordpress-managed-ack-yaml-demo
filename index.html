@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="计算巢是阿里云开放给企业应用服务商的服务管理平台。服务商能够在计算巢上发布私有化部署服务，为其客户提供云上软件一键部署的能力；同时也支持全托管模式的服务，赋能服务商托管其客户资源。">
+  <title>服务模板说明文档 - Aliyun 计算巢 x wordpress-managed-ack-demo</title>
+
+  <link rel="shortcut icon" href="img/favicon.ico">
+
+  <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css">
+  <link rel="stylesheet" href="css/theme.css">
+  
+
+  
+
+  
+  
+
+  
+    <script src="search/main.js"></script>
+  
+
+  
+
+  <script src="js/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
+</head>
+
+<body>
+  <div class="container">
+    <div class="nav">
+      <div class="nav-inner">
+        <div class="logo">
+          <img src="./img/logo-2x.png">
+        </div>
+        <div class="nav-list">
+          <ul>
+          
+              <li><a href="#_1">服务模板说明文档</a></li>
+              
+                  <li><a href="#_2">服务说明</a></li>
+                  
+              
+                  <li><a href="#_3">服务架构</a></li>
+                  
+              
+                  <li><a href="#_4">服务构建计费说明</a></li>
+                  
+              
+                  <li><a href="#ram">RAM账号所需权限</a></li>
+                  
+              
+                  <li><a href="#_5">服务实例计费说明</a></li>
+                  
+              
+                  <li><a href="#_6">服务实例部署流程</a></li>
+                  
+                      <li class="li-h3"><a href="#_7">部署参数说明</a></li>
+                  
+                      <li class="li-h3"><a href="#_8">部署步骤</a></li>
+                  
+              
+                  <li><a href="#_9">服务实例变配流程</a></li>
+                  
+              
+                  <li><a href="#_10">售卖配置</a></li>
+                  
+              
+                  <li><a href="#_11">服务详细说明</a></li>
+                  
+              
+          
+              <li><a href="#_12">更多功能</a></li>
+              
+                  <li><a href="#_13">计量计费</a></li>
+                  
+              
+                  <li><a href="#_14">服务配置</a></li>
+                  
+              
+          
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="content theme-github">
+      
+      <div class="content-inner">        
+        
+        <h1 id="_1">服务模板说明文档</h1>
+<h2 id="_2">服务说明</h2>
+<p>本文介绍容器服务部署wordpress实现托管版多租户的流程，本示例对应的Git仓库地址：<a href="https://github.com/aliyun-computenest/wordpress-managed-ack-demo">wordpress-managed-ack-yaml-demo</a>。</p>
+<p>根据该服务模板构建的服务默认包含三种套餐：</p>
+<table>
+<thead>
+<tr>
+<th>套餐名</th>
+<th>vCPU与内存</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>低配版</td>
+<td>1vCPU 1GiB</td>
+</tr>
+<tr>
+<td>基础版</td>
+<td>2vCPU 2GiB</td>
+</tr>
+<tr>
+<td>高配版</td>
+<td>2vCPU 4GiB</td>
+</tr>
+</tbody>
+</table>
+<p>本示例需要提前准备容器集群，需要到<a href="https://cs.console.aliyun.com/">容器服务控制台</a> 提前创建。
+本示例创建过程大约持续1分钟，当服务变成待提交后构建成功。</p>
+<h2 id="_3">服务架构</h2>
+<p>本部署架构为容器多租户部署，架构如下图所示：
+1. 使用ingress根据域名路由到各个租户的wordpress
+2. 每个租户一个k8s namespace，用namespace隔离
+3. wordpress和mysql使用yaml部署</p>
+<p><img src="architecture.png" width="1500" height="700" align="bottom"/></p>
+<h2 id="_4">服务构建计费说明</h2>
+<p>测试本服务构建无需任何费用，创建服务实例涉及的费用参考服务实例计费说明。</p>
+<h2 id="ram">RAM账号所需权限</h2>
+<p>本服务需要对ECS、VPC等资源进行访问和创建操作，若您使用RAM用户创建服务实例，需要在创建服务实例前，对使用的RAM用户的账号添加相应资源的权限。添加RAM权限的详细操作，请参见<a href="https://help.aliyun.com/document_detail/121945.html">为RAM用户授权</a>。所需权限如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th>权限策略名称</th>
+<th>备注</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AliyunCSFullAccess</td>
+<td>管理容器服务服务（CS）的权限</td>
+</tr>
+<tr>
+<td>AliyunROSFullAccess</td>
+<td>管理资源编排服务（ROS）的权限</td>
+</tr>
+<tr>
+<td>AliyunComputeNestUserFullAccess</td>
+<td>管理计算巢服务（ComputeNest）的用户侧权限</td>
+</tr>
+<tr>
+<td>AliyunComputeNestSupplierFullAccess</td>
+<td>管理计算巢服务（ComputeNest）的服务商侧权限</td>
+</tr>
+</tbody>
+</table>
+<h2 id="_5">服务实例计费说明</h2>
+<p>测试本服务在计算巢上的费用主要涉及：</p>
+<ul>
+<li>导入的容器集群的费用</li>
+<li>在容器集群新建的磁盘、网络等费用</li>
+</ul>
+<h2 id="_6">服务实例部署流程</h2>
+<h3 id="_7">部署参数说明</h3>
+<table>
+<thead>
+<tr>
+<th>参数组</th>
+<th>参数项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>服务实例</td>
+<td>服务实例名称</td>
+<td>长度不超过64个字符，必须以英文字母开头，可包含数字、英文字母、短划线（-）和下划线（_）。</td>
+</tr>
+<tr>
+<td></td>
+<td>地域</td>
+<td>服务实例部署的地域</td>
+</tr>
+</tbody>
+</table>
+<h3 id="_8">部署步骤</h3>
+<ol>
+<li>部署链接
+ <img alt="image.png" src="deploy_1.png" /></li>
+<li>单击部署链接，进入服务实例部署界面，根据界面提示，填写参数完成部署。
+ <img alt="image.png" src="deploy_2.png" /></li>
+<li>参数填写完成后可以看到对应询价明细，确认参数后点击<strong>下一步：确认订单</strong>。</li>
+<li>确认订单完成后同意服务协议并点击<strong>立即创建</strong>。
+   进入待部署阶段。
+    <img alt="image.png" src="deploy_3.png" /></li>
+<li>在用户侧进入待部署状态后需要服务商同意用户的部署。
+    <img alt="image.png" src="deploy_4.png" />
+    <img alt="image.png" src="deploy_5.png" /></li>
+<li>等待部署完成后就可以开始使用服务，进入服务实例详情点击Endpoint。
+    <img alt="image.png" src="deploy_6.png" /></li>
+<li>部署结果
+    <img alt="image.png" src="deploy_7.png" /></li>
+</ol>
+<h2 id="_9">服务实例变配流程</h2>
+<p><img alt="img_2.png" src="modify_1.png" />
+   <img alt="img.png" src="modify_2.png" /></p>
+<p>服务实例创建完成后，用户侧有配置修改的需求，可以点击右上角的修改配置进行变配操作，本服务支持的变配操作有以下三种：
+1. 扩容磁盘，对wordpress中关联的mysql磁盘进行扩容,磁盘只能进行扩容操作，这里从20Gi扩容到40Gi。
+    <img alt="img.png" src="modify_3.png" />
+    <img alt="img_2.png" src="modify_4.png" />
+2. 更改套餐，这个可以对套餐规格进行变更，不同的套餐Pod可用的CPU和内存数量不同。
+    <img alt="img_3.png" src="modify_5.png" />
+    <img alt="img_4.png" src="modify_6.png" />
+3. 更改副本数，这个可以对wordpress副本数进行扩缩容操作。
+    <img alt="img_5.png" src="modify_7.png" />
+    <img alt="img_6.png" src="modify_8.png" /></p>
+<h2 id="_10">售卖配置</h2>
+<p>当前服务因为没有配置售卖链路，所以用户侧部署时候需要服务商的二次确认，当服务上架到阿里云云市场后，就可以不经过服务商的二次确认就可以完成部署。</p>
+<ol>
+<li>计算巢服务审核上线。
+    上到云市场的商品需要在计算巢这里完成上架过程，走通预发布和发布流程，经过审核后上线。
+    <img alt="image.png" src="market_1.png" /></li>
+<li>点击到云市场创建商品，选择类目SaaS服务计算巢托管版。
+    <img alt="image.png" src="market_2.png" />
+    <img alt="image.png" src="market_3.png" /></li>
+<li>按要求添商品信息。</li>
+<li>在销售信息时候选择预付费模式，并配置三个套餐，给三个套餐配置相应的价格。
+    <img alt="image.png" src="market_4.png" />
+    <img alt="image.png" src="market_5.png" /></li>
+<li>完成商品上线和审核。
+    <img alt="image.png" src="market_6.png" /></li>
+<li>到计算巢完成套餐和云市场商品的绑定 (如果名字一样会自动匹配上，可以忽略这个步骤)。
+    <img alt="image.png" src="market_7.png" />
+    <img alt="image.png" src="market_8.png" /></li>
+<li>完成部署。
+    <img alt="image.png" src="market_9.png" />
+    <img alt="image.png" src="market_10.png" />
+    <img alt="image.png" src="market_11.png" />
+    <img alt="image.png" src="market_12.png" /></li>
+<li>至此完成了一个托管版上到云市场并使用的全过程。</li>
+</ol>
+<h2 id="_11">服务详细说明</h2>
+<p>通过ALIYUN::CS::ClusterApplication部署yaml到k8s，并给每个租户的对应到不同namespace上。</p>
+<p>详细对应到template.yaml的代码片段如下所示：
+1. 部署wordpress + mysql。
+2. 部署ingress根据域名将endpoint对应到新创建的wordpress的service上。</p>
+<p>通过配置我们完成了基于容器集群的托管版部署。</p>
+<pre><code class="language-yaml">  ClusterApplication:
+    Type: ALIYUN::CS::ClusterApplication
+    Properties:
+      WaitUntil:
+        - Kind: Deployment
+          Name: wordpress
+          JsonPath: $.status.readyReplicas
+          Operator: Equals
+          Value:
+            Ref: ReplicaCount
+          Timeout: 300
+          ValueType: Json
+          FirstMatch: true
+        - Kind: Deployment
+          Name: wordpress-mysql
+          JsonPath: $.status.readyReplicas
+          Operator: Equals
+          Value: '1'
+          Timeout: 300
+          ValueType: Json
+          FirstMatch: true
+      YamlContent:
+        Fn::Sub:
+          - |
+            apiVersion: v1
+            kind: Secret
+            metadata:
+              name: mysql-pass
+            data:
+              password: bWFyaWFkYg==
+            ---
+            apiVersion: v1
+            kind: Service
+            metadata:
+              name: wordpress-mysql
+              labels:
+                app: wordpress
+            spec:
+              ports:
+                - port: 3306
+              selector:
+                app: wordpress
+                tier: mysql
+              clusterIP: None
+            ---
+            apiVersion: v1
+            kind: PersistentVolumeClaim
+            metadata:
+              name: mysql-pv-claim
+              labels:
+                app: wordpress
+            spec:
+              accessModes:
+                - ReadWriteOnce
+              storageClassName: alicloud-disk-essd
+              resources:
+                requests:
+                  storage: ${Storage}
+            ---
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: wordpress-mysql
+              labels:
+                app: wordpress
+            spec:
+              selector:
+                matchLabels:
+                  app: wordpress
+                  tier: mysql
+              strategy:
+                type: Recreate
+              template:
+                metadata:
+                  labels:
+                    app: wordpress
+                    tier: mysql
+                spec:
+                  containers:
+                  - image: mysql:8.0
+                    name: mysql
+                    resources:
+                      limits:
+                        cpu: ${Vcpu}
+                        memory: ${Memory}
+                      requests:
+                        cpu: ${Vcpu}
+                        memory: ${Memory}
+                    env:
+                    - name: MYSQL_ROOT_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          name: mysql-pass
+                          key: password
+                    - name: MYSQL_DATABASE
+                      value: wordpress
+                    - name: MYSQL_USER
+                      value: wordpress
+                    - name: MYSQL_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          name: mysql-pass
+                          key: password
+                    ports:
+                    - containerPort: 3306
+                      name: mysql
+                    volumeMounts:
+                    - name: mysql-persistent-storage
+                      mountPath: /var/lib/mysql
+                  volumes:
+                  - name: mysql-persistent-storage
+                    persistentVolumeClaim:
+                      claimName: mysql-pv-claim
+            ---
+            apiVersion: v1
+            kind: Service
+            metadata:
+              name: wordpress
+              labels:
+                app: wordpress
+            spec:
+              ports:
+                - port: 80
+              selector:
+                app: wordpress
+                tier: frontend
+              type: ClusterIP
+            ---
+            apiVersion: apps/v1
+            kind: Deployment
+            metadata:
+              name: wordpress
+              labels:
+                app: wordpress
+            spec:
+              replicas: ${ReplicaCount}
+              selector:
+                matchLabels:
+                  app: wordpress
+                  tier: frontend
+              strategy:
+                type: Recreate
+              template:
+                metadata:
+                  labels:
+                    app: wordpress
+                    tier: frontend
+                spec:
+                  containers:
+                  - image: wordpress:6.2.1-apache
+                    name: wordpress
+                    resources:
+                      limits:
+                        cpu: ${Vcpu}
+                        memory: ${Memory}
+                      requests:
+                        cpu: ${Vcpu}
+                        memory: ${Memory}
+                    env:
+                    - name: WORDPRESS_DB_HOST
+                      value: wordpress-mysql
+                    - name: WORDPRESS_DB_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                          name: mysql-pass
+                          key: password
+                    - name: WORDPRESS_DB_USER
+                      value: wordpress
+                    ports:
+                    - containerPort: 80
+                      name: wordpress
+            ---
+            apiVersion: networking.k8s.io/v1
+            kind: Ingress
+            metadata:
+              name: wordpress
+            spec:
+              rules:
+              - host: ${Name}.${ClusterId}.${RegionId}.alicontainer.com
+                http:
+                  paths:
+                  - path: /
+                    backend:
+                      service:
+                        name: wordpress
+                        port:
+                          number: 80
+                    pathType: ImplementationSpecific
+          - Name:
+              Ref: ALIYUN::StackName
+            RegionId:
+              Ref: ALIYUN::Region
+            ClusterId:
+              Ref: ClusterId
+      ClusterId:
+        Ref: ClusterId
+      DefaultNamespace:
+        Ref: ALIYUN::StackName
+</code></pre>
+<h1 id="_12">更多功能</h1>
+<h2 id="_13">计量计费</h2>
+<p><a href="https://help.aliyun.com/zh/compute-nest/customize-a-service-architecture?spm=a2c4g.11186623.0.0.56e736bfyUdlFm]">自定义服务架构图</a></p>
+<p><a href="https://help.aliyun.com/zh/compute-nest/use-cases/publish-documents-to-compute-nest?spm=a2c4g.313309.0.i0]">服务文档上线流程</a></p>
+<p><a href="https://help.aliyun.com/zh/compute-nest/publish-a-service-to-alibaba-cloud-marketplace?spm=a2c4g.11186623.0.i7]">将服务上架云市场并上到云市场售卖</a></p>
+<h2 id="_14">服务配置</h2>
+<p><a href="https://help.aliyun.com/zh/compute-nest/create-a-hosted-operations-and-maintenance-service?spm=a2c4g.11186623.0.i24#task-2167552]">创建代运维服务完成实例运维</a></p>
+<p><a href="https://help.aliyun.com/zh/compute-nest/use-cases/create-a-service-that-supports-specification-changes-and-change-the-specifications-of-a-service-instance?spm=a2c4g.11186623.0.i3]">创建包含变配功能的服务</a></p>
+<p><a href="https://help.aliyun.com/zh/compute-nest/upgrade-a-service-instance?spm=a2c4g.11186623.0.i17#task-2236803">创建包含服务升级功能的服务</a></p>
+        
+      </div>
+
+      <div class="copyrights">© 2009-2022 Aliyun.com 版权所有</div>
+    </div>
+  </div>
+  
+  <!--
+  MkDocs version      : 1.6.1
+  Docs Build Date UTC : 2024-09-19 09:17:20.777068+00:00
+  -->
+</body>
+</html>
