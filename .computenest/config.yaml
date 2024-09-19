@@ -55,6 +55,7 @@ Service:
       - Name: wordpress
         AllowedRegions:
           - ${RegionId}
+        ArchitectureDiagramUrl: 'docs/architecture.png'
         UpdateInfo:
           ParametersAllowedToBeModified:
             - ReplicaCount
